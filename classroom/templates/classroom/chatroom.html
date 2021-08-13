@@ -1,0 +1,229 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block link %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+    <link rel="stylesheet" href="{% static 'classroom/chatroom.css'  %}">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.js"></script>
+{% endblock link %}
+
+{% block content %}
+
+    <div class="container-fluid h-100">
+        {% csrf_token %}
+        <div class="row justify-content-center h-100" style="width: 100%">
+            <div class="col-md-4 col-xl-3 chat"><div class="card mb-sm-3 mb-md-0 contacts_card">
+                <div class="card-header">
+                    <div class="input-group">
+                        <input type="text" placeholder="Search..." name="" class="form-control search">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text search_btn"><i class="fas fa-search"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body contacts_body">
+                    <ul class="contacts">
+                    {% if request.user.is_staff %}
+                        {% for chatMember in chatMembers %}
+                        <li class="active">
+                            <div onclick="changeChat('{{ chatMember.sender }}', '{{ request.user }}')"
+                                 class="d-flex bd-highlight">
+                                <div class="img_cont">
+                                    <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" alt="student"
+                                         class="rounded-circle user_img">
+                                    <span class="online_icon"></span>
+                                </div>
+                                <div class="user_info">
+                                    <span>{{ chatMember.sender }}</span>
+                                    <p>{{ chatMember.sender }} is online</p>
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    {% else %}
+                    {% for chatMember in chatMembers %}
+                        <li class="active">
+                            <div onclick="changeChat('{{ request.user }}', '{{ chatMember.receiver.user }}')"
+                                 class="d-flex bd-highlight">
+                                <div class="img_cont">
+                                        <img src="{{ chatMember.receiver.image.url}}" alt="lecturer-image"
+                                             class="rounded-circle user_img">
+                                    <span class="online_icon"></span>
+                                </div>
+                                <div class="user_info">
+                                    <span>{{ chatMember.receiver.user.teachersprofile.full_name }}</span>
+                                    <p>{{ chatMember.receiver.user.teachersprofile.subject }}'s lecturer</p>
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    {% endif %}
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+            <div class="col-md-8 col-xl-6 chat">
+                <div class="card">
+                    <div class="card-header msg_head">
+                        {% if request.user.is_staff %}
+                            <div class="d-flex bd-highlight">
+                                <div class="img_cont">
+                                    <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" alt="student"
+                                         class="rounded-circle user_img">
+                                    <span class="online_icon"></span>
+                                </div>
+                                <div class="user_info">
+                                    <span>Chat with {{ chattingWith }}</span>
+                                    <p>{{ totalMessages }} Messages</p>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="d-flex bd-highlight">
+                                <div class="img_cont">
+                                    <img src="{{ chattingWith.teachersprofile.image.url }}" alt="lecturer-image"
+                                         class="rounded-circle user_img">
+                                    <span class="online_icon"></span>
+                                </div>
+                                <div class="user_info">
+                                    <span>Chat with {{ chattingWith.teachersprofile.full_name }}</span>
+                                    <p>{{ totalMessages }} Messages</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                        <span id="action_menu_btn"><i class="fas fa-ellipsis-v"></i></span>
+                        <div class="action_menu">
+                            <ul>
+                                <li><i class="fas fa-user-circle"></i> View profile</li>
+                                <li><i class="fas fa-users"></i> Add to close friends</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card-body msg_card_body">
+                        {% for message in messages %}
+                            {% if request.user == message.sender %}
+                                <div class="d-flex justify-content-end mb-4">
+                                    <div class="msg_cotainer_send">
+                                        {{ message.message }}
+                                        <span class="msg_time_send">{{ message.format_time }}</span>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="d-flex justify-content-start mb-4">
+                                    <div class="msg_cotainer">
+                                        {{ message.message }}
+                                        <span class="msg_time">{{ message.format_time }}</span>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="card-footer">
+                        <div class="input-group">
+                            <div class="input-group-append">
+                                <span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span>
+                            </div>
+                            <textarea name="" class="form-control type_msg" id="input" placeholder="Type your message..."></textarea>
+
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-success" id="submit">Send</button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {{ room_name|json_script:"room_name" }}
+    {{ request.user.username|json_script:"user_name" }}
+
+    <script>
+
+        const roomName = JSON.parse(document.getElementById('room_name').textContent);
+        const userName = JSON.parse(document.getElementById('user_name').textContent);
+
+        function changeChat(request_user, chat_member){
+            $.ajax(
+                {
+                    url: "{% url 'chat_room' room_name%}",
+                    type: 'POST',
+                    data: {csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                        request_user:request_user, chat_member:chat_member},
+
+                    success: function (response){
+                        window.location = 'http://127.0.0.1:8000/classroom/chat/'+response.url;
+                    }
+                }
+            )
+        }
+
+        const chatSocket = new WebSocket(
+            'ws://' + window.location.host + '/classroom/chat/' + roomName + '/'
+        )
+
+        document.querySelector("#submit").onclick = function () {
+            let message = $('textarea#input')
+            if (message.val() !== '') {
+                chatSocket.send(
+                    JSON.stringify({
+                        'message': message.val(),
+                        'sender': userName,
+                        'receiver': '{{ chattingWith }}',
+                    })
+                )
+                message.val('');
+            }
+        }
+
+        document.querySelector("#input").focus();
+        document.querySelector("#input").onkeyup = function (e){
+            if(e.keyCode == 13){
+                document.querySelector("#submit").click();
+            }
+        }
+
+        function getDate(){
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+                                "July", "August", "September", "October", "November", "December"];
+            const today = new Date();
+            const date = today.getDate()+'-'+monthNames[(today.getMonth()+1)]
+                + ', ' + today.getHours() + ':' + today.getMinutes();
+            return date
+        }
+
+        chatSocket.onmessage = function (e){
+
+            const data = JSON.parse(e.data);
+            let send_msg_container = document.createElement("div");
+            let msg_container = document.createElement("div");
+            let time_span = document.createElement("span");
+            time_span.innerHTML = getDate();
+            msg_container.innerHTML = data.message;
+            msg_container.appendChild(time_span);
+            send_msg_container.appendChild(msg_container);
+
+            if (data.username == userName){
+                send_msg_container.setAttribute("class", "d-flex justify-content-start mb-4")
+                time_span.setAttribute('class', 'msg_time');
+                msg_container.setAttribute("class", "msg_cotainer")
+                document.getElementsByClassName("msg_card_body")[0].appendChild(send_msg_container)
+            }
+            else {
+                send_msg_container.setAttribute("class", "d-flex justify-content-end mb-4")
+                time_span.setAttribute('class', 'msg_time_send');
+                msg_container.setAttribute("class", "msg_cotainer_send")
+                document.getElementsByClassName("msg_card_body")[0].appendChild(send_msg_container)
+            }
+        }
+
+
+    </script>
+
+{% endblock content %}

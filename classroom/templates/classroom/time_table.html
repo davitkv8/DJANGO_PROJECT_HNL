@@ -1,0 +1,161 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href={% static 'classroom/time_table.css' %}>
+    <title>Time Table</title>
+</head>
+<body>
+
+        <div class="day time">
+            <div class="day_title">
+                <form method="get" action="">
+                    {% if object is not None %}
+                        {% csrf_token %}
+                        {% if request.user.pk == object %}
+                            <button type="button" class="save-schedule">Save</button>
+                        {% else %}
+                            <button type="button" class="save-schedule">BOOK</button>
+                        {% endif %}
+                    {% endif %}
+                </form>
+            </div>
+            <div class="hour">0:00 - 1:00</div>
+            <div class="hour">1:00 - 2:00</div>
+            <div class="hour">2:00 - 3:00</div>
+            <div class="hour">3:00 - 4:00</div>
+            <div class="hour">4:00 - 5:00</div>
+            <div class="hour">5:00 - 6:00</div>
+            <div class="hour">6:00 - 7:00</div>
+            <div class="hour">7:00 - 8:00</div>
+            <div class="hour">8:00 - 9:00</div>
+            <div class="hour">9:00 - 10:00</div>
+            <div class="hour">10:00 - 11:00</div>
+            <div class="hour">11:00 - 12:00</div>
+
+        </div>
+
+        <div class="day monday">
+            <div class="day_title week_days">Monday</div>
+        </div>
+
+        <div class="day tuesday">
+            <div class="day_title week_days">Tuesday</div>
+
+        </div>
+
+        <div class="day wednesday">
+            <div class="day_title week_days">Wednesday</div>
+
+        </div>
+
+        <div class="day thursday">
+            <div class="day_title week_days">Thursday</div>
+
+        </div>
+
+        <div class="day friday">
+          <div class="day_title week_days">Friday</div>
+
+        </div>
+
+        <div class="day saturday">
+            <div class="day_title week_days">Saturday</div>
+
+          </div>
+
+          <div class="day sunday">
+            <div class="day_title week_days">Sunday</div>
+
+          </div>
+
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+
+      <script>
+
+          let requestedUserAvailableDays = [];
+
+          {% for day in days %}
+              requestedUserAvailableDays.push('{{ day }}');
+          {% endfor %}
+          let allDays = {};
+          allDays.availableDays = [];
+          allDays.unavailableDays = [];
+
+          let week_days = document.getElementsByClassName("day");
+          for (let i = 1; i < week_days.length; i++) {
+              for (let j = 0; j < 12; j++) {
+              let div = document.createElement("div");
+              let input = document.createElement("input");
+              let id_forInput = week_days[i].className.split(' ')[1];
+              input.setAttribute("type", "button");
+              input.setAttribute("id", id_forInput+j);
+
+              {% if request.user.pk == object %}
+                  if(requestedUserAvailableDays.includes(id_forInput+j)){
+                      input.setAttribute("style", "background-color: green;");}
+                  else {
+                      input.setAttribute("style", "background-color: #949494;");}
+              {% else %}
+                  if(requestedUserAvailableDays.includes(id_forInput+j)){
+                      input.setAttribute("style", "background-color: #85fa6e;");
+                  }
+                  else {
+                      input.setAttribute("style", "background-color: red; opacity: 50%");
+                      input.setAttribute("disabled", "true")
+                  }
+              {% endif %}
+
+              week_days[i].appendChild(div);
+              div.appendChild(input);
+              }
+          }
+
+
+          document.addEventListener('click', e =>{
+            let clickedElementID = e.target.id;
+            let clickedElement = document.getElementById(clickedElementID);
+            if (clickedElement.style.backgroundColor === "green"){
+                {% if request.user.pk == object %}
+                    document.getElementById(clickedElementID).style.backgroundColor = "#949494";
+                {% else %}
+                    document.getElementById(clickedElementID).style.backgroundColor = "green";
+                {% endif %}
+                let index = allDays.availableDays.indexOf(clickedElement.id);
+                allDays.availableDays.splice(index, 1);
+                allDays.unavailableDays.push(clickedElementID);
+            }
+            else{
+                document.getElementById(clickedElementID).style.backgroundColor="green";
+                allDays.availableDays.push(clickedElementID);
+            }
+          })
+
+          btn = document.getElementsByClassName("save-schedule")[0].onclick = function (){
+          let availableDays = JSON.stringify(allDays);
+          {% if object is not None %}
+          $.ajax(
+                    {
+                        url: "{% url 'time_table' object%}",
+                        type: 'POST',
+                        data: {
+                        availableDays: availableDays,
+                        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+                    },
+                        success: function (response){
+                    }
+           });
+          {% endif %}
+              {% if request.user.pk == object %}
+                  alert("Time table has been saved successfully")
+              {% else %}
+                  alert("Your booking is sent to teacher. We'll notify you when seller gives response back")
+              {% endif %}
+          }
+
+      </script>
+</body>
+</html>

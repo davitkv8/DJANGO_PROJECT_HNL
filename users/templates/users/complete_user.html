@@ -1,0 +1,36 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block link %}
+    <link rel="stylesheet" href="{% static 'users/register.css' %}">
+    <link href="http://netdna.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'users/complete_user.css' %}">
+{% endblock link %}
+
+{% block content %}
+      <div id="login-box">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+         <div class="left">
+             <label for="id_image">Profile Picture:</label>
+             <img class="avatar-image" src={% static  'users/default.jpg'%} alt="avatar">
+             {{ form.image }}
+            <label for="id_description">About you: (3000 words)</label>
+            {% render_field form.description class="about-me" style=" width: 450px; height: 125px; background: rgba(0, 0, 0, 0.5); opacity: 50%" %}
+         </div>
+         <div class="right">
+            <label for="id_birth_date">Birth date:</label>
+            {{ form.birth_date }}
+            <label for="id_lectures_per_week">Full name:</label>
+            {{ form.full_name }}
+            <label for="id_lecture_price">Subject:</label>
+            {{ form.subject }}
+            <label for="id_platform">Monthly fee:</label>
+            {{ form.lecture_price }}
+            <label for="id_subject">Platform: (Primary)</label>
+            {{ form.platform }}
+            <button type="submit" class="btn btn-success">Register</button>
+         </div>
+        </form>
+       </div>
+{% endblock content %}

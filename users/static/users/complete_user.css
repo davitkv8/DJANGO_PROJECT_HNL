@@ -1,0 +1,15 @@
+.left{
+    margin-left: 100px;
+}
+
+.right{
+    margin-right: 100px;
+}
+
+.avatar-image{
+    margin-top: 55px;
+    margin-bottom: 35px;
+}
+input{
+    width: 300px;
+}

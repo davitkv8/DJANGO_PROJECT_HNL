@@ -1,0 +1,140 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% block link %}
+    <link rel="stylesheet" href="{% static "users/classroom.css"%}">
+    <link rel="stylesheet" href="{% static "classroom/feedback.css"%}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+
+{% endblock link %}
+
+
+
+{% block content %}
+
+
+{% for lecture in lecturers %}
+
+      <div class="container mt-5 justify-content-center">
+        <div class="card p-3">
+            <div class="d-flex align-items-center">
+                <div class="image"> <img src="{{ lecture.TeacherObject.receiver.image.url }}"
+                                         alt="lecture-image" class="rounded" width="155"> </div>
+                <div class="ml-3 w-100">
+
+                    <h4 class="mb-0 mt-0">{{ lecture.TeacherObject.receiver.full_name }}</h4>
+                    <span>{{ lecture.TeacherObject.receiver.subject }}</span>
+                    <div class="p-2 mt-2 d-flex justify-content-between rounded text-white stats" style="background-color: green!important;">
+                        <div class="d-flex flex-column">
+                            <span class="articles">{{ lecture.nearestLesson }}</span>
+                            <span class="number1">Homeworks aren't available</span>
+                        </div>
+                    </div>
+                    <div class="button mt-2 d-flex flex-row align-items-center">
+                        <button class="btn btn-sm btn-outline-primary w-100" type="submit">
+                        <a href="{% url 'redirecter' request.user.username lecture.TeacherObject.receiver.user.username %}">Chat</a>
+                        </button>
+
+                        <button class="btn btn-sm btn-outline-primary w-100 start-btn"
+                                onclick="getClickedLecturer({{ lecture.TeacherObject.receiver.pk }})">Feedback</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+
+
+
+{% endfor %}
+
+      <div class="center modal-box">
+         <div class="fas fa-times"></div>
+         <form method="post">
+             {% csrf_token %}
+         <div class="wrapper">
+            <input type="radio" name="rate" id="star-1" class="rating 1">
+            <input type="radio" name="rate" id="star-2" class="rating 2">
+            <input type="radio" name="rate" id="star-3" class="rating 3">
+            <input type="radio" name="rate" id="star-4" class="rating 4">
+            <input type="radio" name="rate" id="star-5" class="rating 5">
+            <div class="content">
+                <textarea cols="50" rows="3" required="required" id="feedback-text"
+                          placeholder="Leave your feedback" style="outline: none"></textarea><br>
+                <div class="stars">
+                    <label for="star-1" class="star-1 fas fa-star" id="1"></label>
+                    <label for="star-2" class="star-2 fas fa-star" id="2"></label>
+                    <label for="star-3" class="star-3 fas fa-star" id="3"></label>
+                    <label for="star-4" class="star-4 fas fa-star" id="4"></label>
+                    <label for="star-5" class="star-5 fas fa-star" id="5"></label>
+                </div>
+            </div>
+            <div class="footer">
+              <button type="button" class="btn btn-success" onclick="leaveFeedback()">Submit</button>
+              <span class="numb" id="feedback-rating"></span>
+            </div>
+          </div>
+         </form>
+      </div>
+
+      <script>
+      document.getElementById("feedback-text").required = true;
+
+      function redirectToChat(lecturer_username, student_username){
+          let room_name = JSON.stringify(lecturer_username + '_' + student_username)
+          console.log(room_name)
+        $.ajax(
+                {
+                    url: "{% url 'chat_room' 1 %}",
+                    type: 'POST',
+                    data: {
+                    room_name: room_name,
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+                },
+                    success: function (response){
+                }
+             });
+      }
+
+         $(document).ready(function(){
+           $('.start-btn').click(function(){
+             $('.modal-box').toggleClass("show-modal");
+             $('.start-btn').toggleClass("show-modal");
+           });
+           $('.fa-times').click(function(){
+             $('.modal-box').toggleClass("show-modal");
+             $('.start-btn').toggleClass("show-modal");
+           });
+         });
+      </script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <script>
+    let feedbackRating;
+    document.querySelectorAll('.rating').forEach(item => {
+      item.addEventListener('click', event => {
+        feedbackRating = item.className[7];
+      })
+    })
+    let lecturer_ids;
+    function getClickedLecturer(lecturer_id){
+        lecturer_ids = lecturer_id
+    }
+
+    function leaveFeedback() {
+        document.getElementsByClassName('fa-times')[0].click()
+        let feedbackText = $('textarea#feedback-text').val();
+
+      $.ajax(
+                {
+                    url: "{% url 'classroom' %}",
+                    type: 'POST',
+                    data: {
+                    lecturer: lecturer_ids, feedbackText: feedbackText, feedbackRating: feedbackRating,
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+                },
+                    success: function (response){
+                }
+           });
+    }
+    </script>
+{% endblock content %}

@@ -1,0 +1,49 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% block link %}
+    <link rel="stylesheet" href='../../static/blog/index.css'>
+{% endblock link %}
+
+{% block content %}
+    <div  class="header">
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="form-box">
+                <h1 style="margin-left: 130px">Find your teacher!</h1>
+
+                <label for="subject"></label>
+                <select id="subject" name="subject" class="search-field business" required>
+                    <option value="">Subject</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Physics">Physics</option>
+                    <option value="Chemistry">Chemistry</option>
+                    <option value="Biology">Biology</option>
+                    <option value="English">English</option>
+                    <option value="Russian">Russian</option>
+                </select>
+
+                <!-- <input type="text" class="search-field business" placeholder="Subject"> -->
+                <label for="price"></label>
+                <select id="price" name="price" class="search-field business" required>
+                    <option value="">Price</option>
+                    <option value=0>0-50</option>
+                    <option value=51>51-100</option>
+                    <option value=101>101-150</option>
+                    <option value=151>151-200</option>
+                    <option value=201>201-</option>
+                </select>
+
+                <label for="rating"></label>
+                <select id="rating" name="rating" class="search-field business">
+                    <option value="">Rating from</option>
+                    <option value=4>⭐⭐⭐⭐</option>
+                    <option value=3>⭐⭐⭐</option>
+                    <option value=2>⭐⭐</option>
+                    <option value='any'>Any</option>
+                </select>
+
+                <button class="search-btn" type="submit">Search</button>
+            </div>
+        </form>
+    </div>
+{% endblock content %}
