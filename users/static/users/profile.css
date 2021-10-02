@@ -52,3 +52,8 @@ p{
 .shadow-none {
     box-shadow: none!important;
 }
+
+#id-description{
+    width: 699px;
+    background-color: red;
+}

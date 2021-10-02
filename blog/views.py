@@ -1,7 +1,12 @@
 from django.shortcuts import render, redirect
+from django.core.exceptions import ObjectDoesNotExist
 
 
 def main_view(request):
+    if request.user.is_authenticated:
+        if request.user.userstatus.status == 'None':
+            return redirect('user-status')
+
     if request.method == "POST":
         subject = request.POST['subject']
         min_price = request.POST['price']

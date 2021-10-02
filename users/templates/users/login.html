@@ -20,7 +20,7 @@
 
          <div class="right">
            <span class="loginwith">Sign in with<br />social network</span>
-
+            {% include "socialaccount/snippets/provider_list.html" with process="login" %}
            <button class="social-signin facebook">Log in with facebook</button>
            <button class="social-signin twitter">Log in with Twitter</button>
            <button class="social-signin google">Log in with Google+</button>

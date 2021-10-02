@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, HttpResponse
+from django.shortcuts import render, redirect, HttpResponse, Http404
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -16,7 +16,7 @@ from .utils import token_generator
 
 # IMPORTING MY MODELS
 from .forms import TeacherRegisterForm, TeacherProfileForm
-from .models import TeachersProfile, Relationship
+from .models import TeachersProfile, Relationship, UserStatus
 from classroom.models import TimeTable
 
 
@@ -55,13 +55,25 @@ def register(request):
                                     )
             login(request, new_user)
             if request.POST['user'] == 'teacher':
-                registered_user.is_staff = True
+                UserStatus.objects.create(user=request.user, status='teacher')
                 registered_user.save()
                 return redirect('complete-user', registered_user.pk)
-            else:
+            elif request.POST['user'] == 'student':
+                UserStatus.objects.create(user=request.user, status='student')
                 return redirect('main-view')
 
     return render(request, 'users/register.html', {'form': form})
+
+
+def user_status(request):
+    if request.user.userstatus.status == 'None':
+        if request.method == "POST":
+            if request.is_ajax():
+                UserStatus.objects.filter(user=request.user).update(status=request.POST['status'])
+                return redirect('main-view')
+        return render(request, 'users/user_status.html')
+    else:
+        raise Http404
 
 
 @login_required
@@ -151,19 +163,6 @@ def lectures_detailed(request, subject, pk):
     if request.method == "POST":
         return redirect("time_table", profile.user.pk)
     return render(request, 'users/profile.html', {'object': profile, 'feedbacks': feedbacks})
-
-
-def relationships(request):
-    receiver = TeachersProfile.objects.get(pk=request.user.teachersprofile.pk)
-    relationship = Relationship.objects.filter(receiver=receiver, status="send").all()
-
-    if request.method == "POST":
-        for i in relationship:
-            if str(i.sender.pk) in request.POST:
-                approved_relationship = Relationship.objects.filter(receiver=receiver, sender=i.sender).first()
-                approved_relationship.status = "Approve"
-                approved_relationship.save()
-    return render(request, 'users/relationships.html', {'requests': relationship})
 
 
 class VerificationView(View):

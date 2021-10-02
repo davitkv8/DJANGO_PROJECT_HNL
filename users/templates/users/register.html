@@ -11,16 +11,16 @@
          <div class="left">
              <form method="post">
                  {% csrf_token %}
-           <h1>Sign up</h1>
-           {{ form }}
+                 <h1>Sign up</h1>
+                 {{ form }}
 
                     <input class="form-check-input" type="radio" id="teacher" name="user" value="teacher">
                     <label for="teacher">Teacher</label><br>
                     <input class="form-check-input" type="radio" id="student" name="user" value="student">
                     <label for="student">Student</label><br>
 
-             <button type="submit" name="signup_submit" value="Sign me up" class="btn btn-success">Submit</button>
-             <p style="font-size: 12px">Already have an account? <a href="{% url "login" %}" style="text-decoration: none">Log in</a></p>
+                    <button type="submit" name="signup_submit" value="Sign me up" class="btn btn-success">Submit</button>
+                    <p style="font-size: 12px">Already have an account? <a href="{% url "login" %}" style="text-decoration: none">Log in</a></p>
              </form>
          </div>
 

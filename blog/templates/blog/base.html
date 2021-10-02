@@ -42,11 +42,12 @@
                       <li><a href="{% url 'register' %}">Sign Up</a></li>
                    </ul>
                 </li>
-             {% elif user.is_authenticated == True and user.is_staff == True %}
-                <li><a href={% url 'complete-user' request.user.pk %}>Profile</a></li>
-                <li><a href={% url 'logout' %}>Log Out</a></li>
-             {% elif user.is_authenticated == True and user.is_staff == False %}
-                 <li><a href={% url 'classroom' %}>Class Room</a></li>
+             {% elif user.is_authenticated == True %}
+                 {% if user.userstatus.status == 'teacher' %}
+                    <li><a href={% url 'complete-user' request.user.pk %}>Profile</a></li>
+                 {% elif user.userstatus.status == 'student' %}
+                     <li><a href={% url 'classroom' %}>Class Room</a></li>
+                 {% endif %}
                  <li><a href={% url 'logout' %}>Log Out</a></li>
              {% endif %}
          </ul>

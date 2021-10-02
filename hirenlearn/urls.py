@@ -27,8 +27,7 @@ from users.views import register,\
     UpdateTeacherProfileView,\
     VerificationView,\
     lectures_detailed,\
-    relationships,\
-    search_result
+    search_result, user_status
 
 from classroom.views import classroom, chat_room, AjaxTimeTable, redirecter, requested_table
 
@@ -46,7 +45,7 @@ urlpatterns = [
     re_path(r'^search/subject-(?P<subject>[A-Z-a-z]+)/min_price-(?P<min_price>[0-9]+)/'
             r'max_price-(?P<max_price>[0-9]+)/rating_from-(?P<rating>[0-9-a-z]+)/$',
             search_result, name='search_result'),
-    path('requests/', relationships, name='relationships'),
+    path('userStatus/', user_status, name='user-status'),
     path('register/', register, name='register'),
     path('', include(urls)),
 
@@ -55,7 +54,10 @@ urlpatterns = [
     path('classroom/', classroom, name='classroom'),
     path('classroom/chat/<str:room_name>/', chat_room, name='chat_room'),
     re_path(r'^time_table/(?P<user_pk>[0-9]+)/$', AjaxTimeTable.as_view(), name="time_table"),
-    path('classroom/<str:student_user>/<str:teacher_user>/', requested_table, name="requested_table")
+    path('classroom/<str:student_user>/<str:teacher_user>/', requested_table, name="requested_table"),
+
+
+    path('accounts/', include('allauth.urls')),
 
 ]
 

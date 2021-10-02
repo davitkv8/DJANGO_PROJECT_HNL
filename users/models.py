@@ -5,8 +5,12 @@ from django.core.validators import MaxValueValidator
 from PIL import Image
 
 
-class TeachersProfile(models.Model):
+class UserStatus(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    status = models.CharField(max_length=7)
 
+
+class TeachersProfile(models.Model):
     birth_date = models.DateField(blank=False, null=False)
     full_name = models.CharField(blank=False, null=False, max_length=55)
     lecture_price = models.PositiveIntegerField(blank=False, null=False, validators=[MaxValueValidator(10000)])
