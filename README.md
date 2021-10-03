@@ -1,4 +1,6 @@
-# DJANGO_PROJECT_HNL
+# DJANGO_PROJECT_HNL  // on master branch
+
+
 
 The project is of a demonstrative nature. I try to show you my web development skills (Back-end, using Django Async channels, djangoRF and etc..). Here, some of the samples used in Front-End are taken from "open source templates" and then edited by me.
 
@@ -17,5 +19,7 @@ Features (What I want to add to this project):
 Add Django Payment method (Students will be able to leave feedback only if they've payed for minimum 2 lectures)
 Add Video Chat APP with Django Agora. (To communicate teachers and students)
 Make more code optimizations.
+
+
 
 Technologies/languages/databases used by me during development - > Python/Django, HTML, CSS, AJAX, JS, Postgres, MYSQL. I've not any experience in deployment.
