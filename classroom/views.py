@@ -33,35 +33,47 @@ def redirecter(request, student, lecturer):
 
 
 @login_required
-def chat_room(request, room_name):
-    room = ChatRoom.objects.filter(roomName=room_name).first()
-    if room is None:
-        room = ChatRoom.objects.create(roomName=room_name)
-        chat_members = room_name.split('_')
-        for chat_member in chat_members:
-            user = User.objects.filter(username=chat_member).first()
-            room.members.add(user)
+def chat_room(request, room_name=None):
+    if room_name is not None:
+        room = ChatRoom.objects.filter(roomName=room_name).first()
+        if room is None:
+            room = ChatRoom.objects.create(roomName=room_name)
+            chat_members = room_name.split('_')
+            for chat_member in chat_members:
+                user = User.objects.filter(username=chat_member).first()
+                room.members.add(user)
 
-    if request.user not in room.members.all():
-        return HttpResponse(status=404)
+        if request.user not in room.members.all():
+            return HttpResponse(status=404)
 
-    chattingwith = ''
-    for user in room.members.all():
-        if request.user != user:
-            chattingwith = user
+        chattingwith = ''
+        for user in room.members.all():
+            if request.user != user:
+                chattingwith = user
 
-    message = ChatRoom.objects.get(roomName=room_name)
-    messages = message.get_messages()
-    total_messages = message.count_messages()
+        message = ChatRoom.objects.get(roomName=room_name)
+        messages = message.get_messages()
+        if room is not None:
+            is_seen = room.is_seen(request.user)
+        message.is_seen(request.user)
+        total_messages = message.count_messages()
 
-    if request.user.is_staff:
+    def get_user_status():
+        try:
+            if request.user.teachersprofile.is_active:
+                pass
+            return True
+        except:
+            return False
+
+    if get_user_status():
         relationships = Relationship.objects.filter(status="Approve", receiver=request.user.teachersprofile).all()
 
     else:
         relationships = Relationship.objects.filter(status="Approve", sender=request.user).all()
 
     if request.is_ajax() and request.method == "POST":
-
+        print("we here!!")
         request_user = User.objects.filter(username=request.POST['request_user']).first()
         chat_member = User.objects.filter(username=request.POST['chat_member']).first()
         new_room_name = request_user.username + '_' + chat_member.username
@@ -74,9 +86,16 @@ def chat_room(request, room_name):
         else:
             return HttpResponse(json.dumps(response), content_type='application/json')
 
-    return render(request, 'classroom/chatroom.html', {'room_name': room_name, 'messages': messages,
+    if room_name is not None:
+        return render(request, 'classroom/chatroom.html', {'room_name': room_name, 'messages': messages,
                                                        'chattingWith': chattingwith, 'totalMessages': total_messages,
-                                                       'chatMembers': relationships})
+                                                       'chatMembers': relationships, 'is_seen': is_seen,
+                                                       "is_teacher": get_user_status()})
+    else:
+        return render(request, 'classroom/chatroom.html', {'room_name': None,
+                                                       'chattingWith': None, 'totalMessages': None,
+                                                       'chatMembers': relationships,
+                                                       "is_teacher": get_user_status()})
 
 
 class AjaxTimeTable(View):

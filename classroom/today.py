@@ -10,7 +10,7 @@ def find_nearest_lecture_time(list1):
     sorted_list = []; sorted_list2 = []; sorted_list3 = []; sorted_list4 = []; sorted_list5 = []; sorted_list6 = [];\
                                                                                                          sorted_list7 = []
     for c in list1:
-        if "monday" in c[0:-1].split(",") or "tuesday" in c[0:-2].split(","):
+        if "monday" in c[0:-1].split(",") or "monday" in c[0:-2].split(","):
             sorted_list.append(c)
         elif "tuesday" in c[0:-1].split(",") or "tuesday" in c[0:-2].split(","):
             sorted_list2.append(c)
@@ -39,9 +39,7 @@ def find_nearest_lecture_time(list1):
                 nearest_day = c
                 if nearest_day:
                     break
-        if nearest_day:
-            break
-        index_today += 1
+
         if index_today == 6:
             while first_day <= 6 - (6 - started_index):
                 for c in full_sorted:
@@ -53,6 +51,9 @@ def find_nearest_lecture_time(list1):
                 if nearest_day:
                     break
                 first_day += 1
+        if nearest_day:
+            break
+        index_today += 1
 
     return date_converter(nearest_day)
 

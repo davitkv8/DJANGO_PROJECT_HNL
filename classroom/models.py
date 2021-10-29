@@ -13,6 +13,9 @@ class Message(models.Model):
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="messageReceiver", null=False)
     message = models.TextField(max_length=3000, null=False)
     timestamp = models.DateTimeField(auto_now_add=True)
+    seen = models.BooleanField(default=False)
+
+
 
     def format_time(self):
         return self.timestamp.strftime('%B %d, %H:%M')
@@ -24,11 +27,27 @@ class Message(models.Model):
 class ChatRoom(models.Model):
     roomName = models.CharField(max_length=55, unique=True, null=True)
     members = models.ManyToManyField(User, blank=False)
-    # last_activity = models.DateTimeField(auto_now_add=True)
+
+    def get_chat_object(self):
+        return Message.objects.filter((Q(sender=self.members.first()) & Q(receiver=self.members.last()))
+                                      | (Q(receiver=self.members.first()) & Q(sender=self.members.last())))
 
     def get_chat(self):
-        return Message.objects.filter((Q(sender=self.members.first()) & Q(receiver=self.members.last()))
-                                      | (Q(receiver=self.members.first()) & Q(sender=self.members.last()))).all()
+        return self.get_chat_object().all()
+
+    def is_seen(self, user):
+        try:
+            if user == self.get_chat_object().last().receiver:
+                o1 = self.get_chat_object().last()
+                o1.seen = True
+                o1.save()
+
+        except:
+            pass
+        finally:
+            if self.get_chat_object().last() is not None:
+                return self.get_chat_object().last().seen
+            else: return None
 
     def count_messages(self):
         return self.get_chat().count()

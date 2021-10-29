@@ -1,0 +1,5 @@
+{% extends 'blog/base.html' %}
+
+{% block notification %}
+    <li><a href={% url 'complete-user' request.user.pk %}>ZD</a></li>
+{% endblock notification %}

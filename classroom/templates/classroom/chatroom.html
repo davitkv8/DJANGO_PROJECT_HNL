@@ -27,7 +27,7 @@
                 </div>
                 <div class="card-body contacts_body">
                     <ul class="contacts">
-                    {% if request.user.is_staff %}
+                    {% if is_teacher %}
                         {% for chatMember in chatMembers %}
                         <li class="active">
                             <div onclick="changeChat('{{ chatMember.sender }}', '{{ request.user }}')"
@@ -70,7 +70,8 @@
             <div class="col-md-8 col-xl-6 chat">
                 <div class="card">
                     <div class="card-header msg_head">
-                        {% if request.user.is_staff %}
+                    {% if chattingWith and totalMessages != None %}
+                        {% if is_teacher %}
                             <div class="d-flex bd-highlight">
                                 <div class="img_cont">
                                     <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" alt="student"
@@ -78,8 +79,8 @@
                                     <span class="online_icon"></span>
                                 </div>
                                 <div class="user_info">
-                                    <span>Chat with {{ chattingWith }}</span>
-                                    <p>{{ totalMessages }} Messages</p>
+                                        <span>Chat with {{ chattingWith }}</span>
+                                        <p>{{ totalMessages }} Messages</p>
                                 </div>
                             </div>
                         {% else %}
@@ -95,6 +96,7 @@
                                 </div>
                             </div>
                         {% endif %}
+                    {% endif %}
                         <span id="action_menu_btn"><i class="fas fa-ellipsis-v"></i></span>
                         <div class="action_menu">
                             <ul>
@@ -122,6 +124,7 @@
                             {% endif %}
                         {% endfor %}
                     </div>
+                {% if chattingWith != None %}
                     <div class="card-footer">
                         <div class="input-group">
                             <div class="input-group-append">
@@ -135,6 +138,7 @@
                             </div>
                         </div>
                     </div>
+                {% endif %}
                 </div>
             </div>
 
@@ -143,14 +147,32 @@
 
     {{ room_name|json_script:"room_name" }}
     {{ request.user.username|json_script:"user_name" }}
+    {{ is_seen|json_script:"is_seen" }}
 
     <script>
 
         const roomName = JSON.parse(document.getElementById('room_name').textContent);
         const userName = JSON.parse(document.getElementById('user_name').textContent);
+        const is_seen = JSON.parse(document.getElementById('is_seen').textContent);
+        get_last_msg()
 
         function changeChat(request_user, chat_member){
-            $.ajax(
+            if (roomName === null){
+                            $.ajax(
+                {
+                    url: "{% url 'chat_room_none' %}",
+                    type: 'POST',
+                    data: {csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                        request_user:request_user, chat_member:chat_member},
+
+                    success: function (response){
+                        window.location = 'http://127.0.0.1:8000/classroom/chat/'+response.url;
+                    }
+                }
+            )
+            }
+            else {
+                $.ajax(
                 {
                     url: "{% url 'chat_room' room_name%}",
                     type: 'POST',
@@ -162,6 +184,7 @@
                     }
                 }
             )
+            }
         }
 
         const chatSocket = new WebSocket(
@@ -185,8 +208,28 @@
         document.querySelector("#input").focus();
         document.querySelector("#input").onkeyup = function (e){
             if(e.keyCode == 13){
+                let spanEl = document.getElementById("seenAlert");
+                if (spanEl != null){
+                    spanEl.remove();
+                }
                 document.querySelector("#submit").click();
             }
+        }
+        function get_last_msg() {
+            let messages_count = {{ totalMessages }};
+            if (messages_count > 0){
+                let messagesClass = document.getElementsByClassName("d-flex mb-4");
+                let firstElement = (messagesClass[messagesClass.length - 1]).children[0];
+                let span = document.createElement("span");
+                span.setAttribute("style", "font-size:10px");
+                span.setAttribute("id", "seenAlert");
+                if (firstElement.className === "msg_cotainer_send") {
+                    if (is_seen === true) {
+                        span.innerHTML = "&#10003" + "seen";
+                        firstElement.appendChild(span);
+                    }
+                }
+              }
         }
 
         function getDate(){

@@ -22,7 +22,7 @@
             <label for="id_birth_date">Birth date:</label>
             {{ form.birth_date }}
             <label for="id_lectures_per_week">Full name:</label>
-            {{ form.full_name }}
+            {% render_field form.full_name value=full_name %}
             <label for="id_lecture_price">Subject:</label>
             {{ form.subject }}
             <label for="id_platform">Monthly fee:</label>

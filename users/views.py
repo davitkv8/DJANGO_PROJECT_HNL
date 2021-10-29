@@ -54,12 +54,14 @@ def register(request):
                                     password=form.cleaned_data['password1'],
                                     )
             login(request, new_user)
+            print(UserStatus.objects.get(user=request.user))
             if request.POST['user'] == 'teacher':
-                UserStatus.objects.create(user=request.user, status='teacher')
+                UserStatus.objects.filter(user=request.user).update(status=request.POST['user'])
                 registered_user.save()
                 return redirect('complete-user', registered_user.pk)
             elif request.POST['user'] == 'student':
-                UserStatus.objects.create(user=request.user, status='student')
+                UserStatus.objects.filter(user=request.user).update(status=request.POST['user'])
+                registered_user.save()
                 return redirect('main-view')
 
     return render(request, 'users/register.html', {'form': form})
@@ -100,7 +102,9 @@ def complete_user_registration(request, pk):  # User's Primary key
             teacher_profile_object.save()
             return email_verification(request, pk)
 
-    return render(request, 'users/complete_user.html', {'form': form})
+    user_full_name = request.user.first_name + ' ' + request.user.last_name
+
+    return render(request, 'users/complete_user.html', {'form': form, 'full_name': user_full_name})
 
 
 class UpdateTeacherProfileView(UserPassesTestMixin, LoginRequiredMixin, UpdateView):
@@ -115,7 +119,7 @@ class UpdateTeacherProfileView(UserPassesTestMixin, LoginRequiredMixin, UpdateVi
         context['friendRequest'] = Relationship.objects.filter(receiver=self.object, status='send').all()
         context['hasTimeTable'] = TimeTable.objects.filter(user=self.object.user).first()
         context['feedbacks'] = self.object.feedback.all().order_by('date')[:10]
-        context['verification_request'] = email_verification(request=self.request, pk=self.request.user.pk)
+        # context['verification_request'] = email_verification(request=self.request, pk=self.request.user.pk)
         return context
 
     def test_func(self):
@@ -129,6 +133,10 @@ class UpdateTeacherProfileView(UserPassesTestMixin, LoginRequiredMixin, UpdateVi
 
     def post(self, request, *args, **kwargs):
         if request.is_ajax():
+            if request.POST["type"] == "verify_request":
+                email_verification(self.request, request.POST["user"])
+                return HttpResponse()
+
             rel = Relationship.objects.get(receiver=request.user.teachersprofile,
                                            sender=request.POST["user"], status="send")
             if request.POST["type"] == "approve":
@@ -136,6 +144,7 @@ class UpdateTeacherProfileView(UserPassesTestMixin, LoginRequiredMixin, UpdateVi
                 rel.save()
             else:
                 rel.delete()
+
             return HttpResponse()
         else:
             return super().post(request, *args, **kwargs)

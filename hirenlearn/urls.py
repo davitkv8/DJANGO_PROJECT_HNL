@@ -53,6 +53,7 @@ urlpatterns = [
     path('redirect/<str:student>/<str:lecturer>/', redirecter, name='redirecter'),
     path('classroom/', classroom, name='classroom'),
     path('classroom/chat/<str:room_name>/', chat_room, name='chat_room'),
+    path('classroom/chat/', chat_room, name='chat_room_none'),
     re_path(r'^time_table/(?P<user_pk>[0-9]+)/$', AjaxTimeTable.as_view(), name="time_table"),
     path('classroom/<str:student_user>/<str:teacher_user>/', requested_table, name="requested_table"),
 
