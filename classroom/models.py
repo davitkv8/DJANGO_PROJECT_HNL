@@ -15,8 +15,6 @@ class Message(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     seen = models.BooleanField(default=False)
 
-
-
     def format_time(self):
         return self.timestamp.strftime('%B %d, %H:%M')
 

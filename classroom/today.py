@@ -7,7 +7,8 @@ def find_nearest_lecture_time(list1):
     my_date = date.today()
     index_today = my_date.weekday()
 
-    sorted_list = []; sorted_list2 = []; sorted_list3 = []; sorted_list4 = []; sorted_list5 = []; sorted_list6 = [];\
+    sorted_list = []; sorted_list2 = []; sorted_list3 = [];
+    sorted_list4 = []; sorted_list5 = []; sorted_list6 = [];\
                                                                                                          sorted_list7 = []
     for c in list1:
         if "monday" in c[0:-1].split(",") or "monday" in c[0:-2].split(","):
@@ -61,12 +62,10 @@ def find_nearest_lecture_time(list1):
 def date_converter(weekday):
     try:
         k = int(weekday[-2:])
-        print(k)
     except ValueError:
         k = int(weekday[-1:])
-        print(k)
     finally:
         if str(k).__len__() < 2:
             remake = weekday[0].upper() + weekday[1:-str(k).__len__()] + " - 0" + str(k) + ":00"
-        return remake
+            return remake
 

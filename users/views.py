@@ -163,7 +163,7 @@ def search_result(request, subject, min_price=0, max_price=10000, rating=0):
     results_number = final_result.__len__()
     return render(request, 'users/search_result.html', {'teachers': final_result, 'result_number': results_number})
 
-
+@login_required(login_url = '/login/')
 def lectures_detailed(request, subject, pk):
     profile = TeachersProfile.objects.get(pk=pk)
     feedbacks = profile.feedback.all()
