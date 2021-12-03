@@ -3,5 +3,5 @@ import os
 
 
 def setVar():
-    os.environ['EMAIL_USER'] = 'davit.kv8@gmail.com'
-    os.environ['EMAIL_PASS'] = 'Datoieminerva2'
+    os.environ['EMAIL_USER'] = ''
+    os.environ['EMAIL_PASS'] = ''
