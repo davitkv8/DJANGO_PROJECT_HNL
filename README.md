@@ -22,4 +22,4 @@ Make more code optimizations.
 
 
 
-Technologies/languages/databases used by me during development - > Python/Django, HTML, CSS, AJAX, JS, Postgres, MYSQL. I've not any experience in deployment.
+Technologies/languages/databases used by me during development - > Python/Django, HTML, CSS, AJAX, JS, Postgres, MYSQL. 
