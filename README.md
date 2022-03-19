@@ -19,7 +19,4 @@ Features (What I want to add to this project):
 Add Django Payment method (Students will be able to leave feedback only if they've payed for minimum 2 lectures)
 Add Video Chat APP with Django Agora. (To communicate teachers and students)
 Make more code optimizations.
-
-
-
-Technologies/languages/databases used by me during development - > Python/Django, HTML, CSS, AJAX, JS, Postgres, MYSQL. 
+Preparing for deployment.
